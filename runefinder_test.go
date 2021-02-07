@@ -20,6 +20,13 @@ func TestFindRunes(t *testing.T) {
 	assert.Len(t, runes, 1)
 }
 
+func TestFindRunesWithMoreThanOneWord(t *testing.T) {
+	file, _ := openUnicodeData()
+
+	runes := FindRunes(file, "FACE EYES")
+	assert.Len(t, runes, 12)
+}
+
 func TestPrepareLineIgnoreEmptiness(t *testing.T) {
 	code, name, words, err := PrepareLine("")
 

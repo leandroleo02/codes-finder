@@ -32,13 +32,22 @@ func PrepareLine(line string) (rune, string, []string, error) { // TODO: line sh
 	return rune(code), name, words, nil
 }
 
-func matchLine(wordNames []string, word string) bool {
+func match(wordNames []string, word string) bool {
 	for _, wordName := range wordNames {
 		if wordName == word {
 			return true
 		}
 	}
 	return false
+}
+
+func matchAll(wordNames []string, words []string) bool {
+	for _, word := range words {
+		if !match(wordNames, word) {
+			return false
+		}
+	}
+	return true
 }
 
 // FindRunes search in the file for the words in the description
@@ -53,11 +62,9 @@ func FindRunes(f *os.File, criteria string) []string {
 			// TODO: is this ok to check empty line?
 			continue
 		}
-		for _, word := range words {
-			if matchLine(wordNames, word) {
-				lineFormatted := fmt.Sprintf("U+%04X\t%[1]c\t%s", code, name)
-				runes = append(runes, lineFormatted)
-			}
+		if matchAll(wordNames, words) {
+			lineFormatted := fmt.Sprintf("U+%04X\t%[1]c\t%s", code, name)
+			runes = append(runes, lineFormatted)
 		}
 	}
 	return runes
@@ -77,7 +84,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	runes := FindRunes(file, strings.ToUpper(strings.Join(os.Args[1:], " ")))
+	criteria := strings.Join(os.Args[1:], " ")
+	runes := FindRunes(file, strings.ToUpper(criteria))
 	for _, r := range runes {
 		fmt.Println(r)
 	}
