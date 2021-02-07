@@ -37,7 +37,7 @@ func TestFindRunesUsingSecondNameColumn(t *testing.T) {
 func TestPrepareLineIgnoreEmptiness(t *testing.T) {
 	code, name, words, err := PrepareLine("")
 
-	assert.Equal(t, code, int32(0))
+	assert.Equal(t, code, int32(-1))
 	assert.Equal(t, name, "")
 	assert.Len(t, words, 0)
 	assert.Error(t, err)

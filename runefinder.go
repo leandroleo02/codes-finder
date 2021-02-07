@@ -22,9 +22,9 @@ func split(words string) []string {
 }
 
 // PrepareLine analise the line and returns the fields
-func PrepareLine(line string) (rune, string, []string, error) { // TODO: line should be a struct?
+func PrepareLine(line string) (rune, string, []string, error) {
 	if line == "" {
-		return 0, "", nil, errors.New("Empty Line")
+		return -1, "", nil, errors.New("Empty Line")
 	}
 
 	fields := strings.Split(line, ";")
@@ -71,7 +71,7 @@ func FindRunes(f *os.File, criteria string) []string {
 		words := split(criteria)
 		code, name, nameWords, err := PrepareLine(line)
 		if err != nil {
-			// TODO: is this ok to check empty line?
+			log.Println(err)
 			continue
 		}
 		if containsAll(nameWords, words) {
