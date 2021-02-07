@@ -17,7 +17,7 @@ func TestFindRunes(t *testing.T) {
 	file, _ := openUnicodeData()
 
 	runes := FindRunes(file, "CHIPMUNK")
-	assert.Len(t, runes, 0)
+	assert.Len(t, runes, 1)
 }
 
 func TestPrepareLineIgnoreEmptiness(t *testing.T) {
@@ -36,4 +36,13 @@ func TestPrepareLineWithSingleWordDescription(t *testing.T) {
 	assert.Equal(t, code, rune(128063))
 	assert.Equal(t, name, "CHIPMUNK")
 	assert.Len(t, words, 1)
+}
+
+func TestPrepareLineWithMultipleWordDescriptionSeparetedOnlyBySpace(t *testing.T) {
+	code, name, words, err := PrepareLine("1F601;GRINNING FACE WITH SMILING EYES;So;0;ON;;;;;N;;;;;")
+
+	assert.NoError(t, err)
+	assert.Equal(t, code, rune(128513))
+	assert.Equal(t, name, "GRINNING FACE WITH SMILING EYES")
+	assert.Len(t, words, 5)
 }

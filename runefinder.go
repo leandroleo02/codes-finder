@@ -14,10 +14,6 @@ const (
 	ucd = "UnicodeData.txt"
 )
 
-func matchLine(line string, word string) bool {
-	return false
-}
-
 func splitWords(words string) []string {
 	return strings.Split(words, " ")
 }
@@ -36,6 +32,15 @@ func PrepareLine(line string) (rune, string, []string, error) { // TODO: line sh
 	return rune(code), name, words, nil
 }
 
+func matchLine(wordNames []string, word string) bool {
+	for _, wordName := range wordNames {
+		if wordName == word {
+			return true
+		}
+	}
+	return false
+}
+
 // FindRunes search in the file for the words in the description
 func FindRunes(f *os.File, criteria string) []string {
 	scanner := bufio.NewScanner(f)
@@ -43,22 +48,19 @@ func FindRunes(f *os.File, criteria string) []string {
 	for scanner.Scan() {
 		line := scanner.Text()
 		words := splitWords(criteria)
+		code, name, wordNames, err := PrepareLine(line)
+		if err != nil {
+			// TODO: is this ok to check empty line?
+			continue
+		}
 		for _, word := range words {
-			if matchLine(line, word) {
-				// TODO: format line
-				runes = append(runes, line)
+			if matchLine(wordNames, word) {
+				lineFormatted := fmt.Sprintf("U+%04X\t%[1]c\t%s", code, name)
+				runes = append(runes, lineFormatted)
 			}
 		}
 	}
 	return runes
-}
-
-func listContent(f *os.File) {
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		line := scanner.Text()
-		fmt.Println(line)
-	}
 }
 
 func openUnicodeData() (*os.File, error) {
@@ -75,6 +77,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	listContent(file)
+	runes := FindRunes(file, strings.ToUpper(strings.Join(os.Args[1:], " ")))
+	for _, r := range runes {
+		fmt.Println(r)
+	}
 	file.Close()
 }
