@@ -14,8 +14,11 @@ const (
 	ucd = "UnicodeData.txt"
 )
 
-func splitWords(words string) []string {
-	return strings.Split(words, " ")
+func split(words string) []string {
+	splitter := func(c rune) bool {
+		return c == ' ' || c == '-'
+	}
+	return strings.FieldsFunc(words, splitter)
 }
 
 // PrepareLine analise the line and returns the fields
@@ -27,13 +30,22 @@ func PrepareLine(line string) (rune, string, []string, error) { // TODO: line sh
 	fields := strings.Split(line, ";")
 	code, _ := strconv.ParseInt(fields[0], 16, 32)
 	name := fields[1]
-	words := splitWords(fields[1])
+	nameWords := split(fields[1])
 
-	return rune(code), name, words, nil
+	if fields[10] != "" {
+		name += fmt.Sprintf(" (%s)", fields[10])
+		for _, word := range split(fields[10]) {
+			if !contains(nameWords, word) {
+				nameWords = append(nameWords, word)
+			}
+		}
+	}
+
+	return rune(code), name, nameWords, nil
 }
 
-func match(wordNames []string, word string) bool {
-	for _, wordName := range wordNames {
+func contains(nameWords []string, word string) bool {
+	for _, wordName := range nameWords {
 		if wordName == word {
 			return true
 		}
@@ -41,9 +53,9 @@ func match(wordNames []string, word string) bool {
 	return false
 }
 
-func matchAll(wordNames []string, words []string) bool {
+func containsAll(nameWords []string, words []string) bool {
 	for _, word := range words {
-		if !match(wordNames, word) {
+		if !contains(nameWords, word) {
 			return false
 		}
 	}
@@ -56,13 +68,13 @@ func FindRunes(f *os.File, criteria string) []string {
 	var runes []string
 	for scanner.Scan() {
 		line := scanner.Text()
-		words := splitWords(criteria)
-		code, name, wordNames, err := PrepareLine(line)
+		words := split(criteria)
+		code, name, nameWords, err := PrepareLine(line)
 		if err != nil {
 			// TODO: is this ok to check empty line?
 			continue
 		}
-		if matchAll(wordNames, words) {
+		if containsAll(nameWords, words) {
 			lineFormatted := fmt.Sprintf("U+%04X\t%[1]c\t%s", code, name)
 			runes = append(runes, lineFormatted)
 		}

@@ -27,6 +27,13 @@ func TestFindRunesWithMoreThanOneWord(t *testing.T) {
 	assert.Len(t, runes, 12)
 }
 
+func TestFindRunesUsingSecondNameColumn(t *testing.T) {
+	file, _ := openUnicodeData()
+
+	runes := FindRunes(file, "NON SPACING RIGHT ARROW ABOVE")
+	assert.Len(t, runes, 2)
+}
+
 func TestPrepareLineIgnoreEmptiness(t *testing.T) {
 	code, name, words, err := PrepareLine("")
 
