@@ -21,7 +21,8 @@ func split(words string) []string {
 	return strings.FieldsFunc(words, splitter)
 }
 
-// PrepareLine analise the line and returns the fields
+// PrepareLine analise the line and returns the fields.
+// docs: https://www.unicode.org/Public/5.1.0/ucd/UCD.html#UnicodeData.txt
 func PrepareLine(line string) (rune, string, []string, error) {
 	if line == "" {
 		return -1, "", nil, errors.New("Empty Line")
@@ -31,10 +32,11 @@ func PrepareLine(line string) (rune, string, []string, error) {
 	code, _ := strconv.ParseInt(fields[0], 16, 32)
 	name := fields[1]
 	nameWords := split(fields[1])
+	oldUnicodeName := fields[10]
 
-	if fields[10] != "" {
-		name += fmt.Sprintf(" (%s)", fields[10])
-		for _, word := range split(fields[10]) {
+	if oldUnicodeName != "" {
+		name += fmt.Sprintf(" (%s)", oldUnicodeName)
+		for _, word := range split(oldUnicodeName) {
 			if !contains(nameWords, word) {
 				nameWords = append(nameWords, word)
 			}
