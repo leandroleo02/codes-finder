@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strconv"
@@ -65,8 +66,8 @@ func containsAll(nameWords []string, words []string) bool {
 }
 
 // FindRunes search in the file for the words in the description
-func FindRunes(f *os.File, criteria string) []string {
-	scanner := bufio.NewScanner(f)
+func FindRunes(r io.Reader, criteria string) []string {
+	scanner := bufio.NewScanner(r)
 	var runes []string
 	for scanner.Scan() {
 		line := scanner.Text()

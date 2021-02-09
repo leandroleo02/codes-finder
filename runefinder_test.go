@@ -1,10 +1,28 @@
 package main
 
 import (
+	"bytes"
+	"io"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func unicodeDataFixture() io.Reader {
+	var buf bytes.Buffer
+
+	buf.WriteString("1DA19;SIGNWRITING EYES HALF OPEN;Mn;0;NSM;;;;;N;;;;;\n")
+	buf.WriteString("1DA1A;SIGNWRITING EYES WIDE OPEN;Mn;0;NSM;;;;;N;;;;;\n")
+	buf.WriteString("1DA1B;SIGNWRITING EYES HALF CLOSED;Mn;0;NSM;;;;;N;;;;;\n")
+	buf.WriteString("1DA1C;SIGNWRITING EYES WIDENING MOVEMENT;Mn;0;NSM;;;;;N;;;;;\n")
+	buf.WriteString("1F43F;CHIPMUNK;So;0;ON;;;;;N;;;;;\n")
+	buf.WriteString("1F601;GRINNING FACE WITH SMILING EYES;So;0;ON;;;;;N;;;;;\n")
+	buf.WriteString("1F604;SMILING FACE WITH OPEN MOUTH AND SMILING EYES;So;0;ON;;;;;N;;;;;\n")
+	buf.WriteString("20D7;COMBINING RIGHT ARROW ABOVE;Mn;230;NSM;;;;;N;NON-SPACING RIGHT ARROW ABOVE;;;;\n")
+
+	return strings.NewReader(buf.String())
+}
 
 func TestReadFile(t *testing.T) {
 	file, err := openUnicodeData()
@@ -13,25 +31,32 @@ func TestReadFile(t *testing.T) {
 	assert.NotNil(t, file)
 }
 
-func TestFindRunes(t *testing.T) {
-	file, _ := openUnicodeData()
+func TestFindRunesEmptyKeyWord(t *testing.T) {
+	r := unicodeDataFixture()
 
-	runes := FindRunes(file, "CHIPMUNK")
+	runes := FindRunes(r, "")
+	assert.Len(t, runes, 8)
+}
+
+func TestFindRunesWithOneKeyWord(t *testing.T) {
+	r := unicodeDataFixture()
+
+	runes := FindRunes(r, "CHIPMUNK")
 	assert.Len(t, runes, 1)
 }
 
 func TestFindRunesWithMoreThanOneWord(t *testing.T) {
-	file, _ := openUnicodeData()
+	r := unicodeDataFixture()
 
-	runes := FindRunes(file, "FACE EYES")
-	assert.Len(t, runes, 12)
+	runes := FindRunes(r, "FACE EYES")
+	assert.Len(t, runes, 2)
 }
 
 func TestFindRunesUsingSecondNameColumn(t *testing.T) {
-	file, _ := openUnicodeData()
+	r := unicodeDataFixture()
 
-	runes := FindRunes(file, "NON SPACING RIGHT ARROW ABOVE")
-	assert.Len(t, runes, 2)
+	runes := FindRunes(r, "NON SPACING RIGHT ARROW ABOVE")
+	assert.Len(t, runes, 1)
 }
 
 func TestPrepareLineIgnoreEmptiness(t *testing.T) {
