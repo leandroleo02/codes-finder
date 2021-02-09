@@ -25,10 +25,16 @@ func unicodeDataFixture() io.Reader {
 }
 
 func TestReadFile(t *testing.T) {
-	file, err := openUnicodeData()
+	file, err := openUnicodeData(Ucd)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, file)
+}
+
+func TestErrorReadFile(t *testing.T) {
+	_, err := openUnicodeData("UnicodeDataDoesNotExist.txt")
+
+	assert.Error(t, err)
 }
 
 func TestFindRunesEmptyKeyWord(t *testing.T) {

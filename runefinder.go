@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	ucd = "UnicodeData.txt"
+	// Ucd is the file path for unicode data table
+	Ucd = "UnicodeData.txt"
 )
 
 func split(words string) []string {
@@ -85,8 +86,8 @@ func FindRunes(r io.Reader, criteria string) []string {
 	return runes
 }
 
-func openUnicodeData() (*os.File, error) {
-	file, err := os.Open(ucd)
+func openUnicodeData(filePath string) (*os.File, error) {
+	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +95,7 @@ func openUnicodeData() (*os.File, error) {
 }
 
 func main() {
-	file, err := openUnicodeData()
+	file, err := openUnicodeData(Ucd)
 	if err != nil {
 		log.Fatal(err)
 	}
