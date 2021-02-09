@@ -65,6 +65,13 @@ func TestFindRunesUsingSecondNameColumn(t *testing.T) {
 	assert.Len(t, runes, 1)
 }
 
+func TestFindRunesUsingKeyWordsArray(t *testing.T) {
+	r := unicodeDataFixture()
+
+	runes := FindRunesNew(r, "NON", "SPACING", "RIGHT", "ARROW", "ABOVE")
+	assert.Len(t, runes, 1)
+}
+
 func TestPrepareLineIgnoreEmptiness(t *testing.T) {
 	code, name, words, err := PrepareLine("")
 

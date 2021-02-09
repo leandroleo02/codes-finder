@@ -50,7 +50,7 @@ func PrepareLine(line string) (rune, string, []string, error) {
 
 func contains(nameWords []string, word string) bool {
 	for _, wordName := range nameWords {
-		if wordName == word {
+		if wordName == strings.ToUpper(word) { // TODO: melhor forma
 			return true
 		}
 	}
@@ -79,6 +79,25 @@ func FindRunes(r io.Reader, keyWords string) []string {
 			continue
 		}
 		if containsAll(nameWords, words) {
+			lineFormatted := fmt.Sprintf("U+%04X\t%[1]c\t%s", code, name)
+			runes = append(runes, lineFormatted)
+		}
+	}
+	return runes
+}
+
+// FindRunesNew search in the file for the words in the description
+func FindRunesNew(r io.Reader, keyWords ...string) []string {
+	scanner := bufio.NewScanner(r)
+	var runes []string
+	for scanner.Scan() {
+		line := scanner.Text()
+		code, name, nameWords, err := PrepareLine(line)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		if containsAll(nameWords, keyWords) {
 			lineFormatted := fmt.Sprintf("U+%04X\t%[1]c\t%s", code, name)
 			runes = append(runes, lineFormatted)
 		}
