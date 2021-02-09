@@ -65,6 +65,30 @@ func TestFindRunesUsingKeyWordsArray(t *testing.T) {
 	assert.Len(t, runes, 1)
 }
 
+func TestUnicodeDataStringWithSimpleName(t *testing.T) {
+	var ud UnicodeData
+	ud = NewUnicodeData(128063, "CHIPMUNK", "")
+
+	assert.Equal(t, ud.String(), "U+1F43F	🐿	CHIPMUNK")
+	assert.ElementsMatch(t, ud.nameWords(), []string{"CHIPMUNK"})
+}
+
+func TestUnicodeDataStringWithCompoundName(t *testing.T) {
+	var ud UnicodeData
+	ud = NewUnicodeData(128063, "GRINNING FACE WITH SMILING EYES", "")
+
+	assert.Equal(t, ud.String(), "U+1F43F	🐿	GRINNING FACE WITH SMILING EYES")
+	assert.ElementsMatch(t, ud.nameWords(), []string{"GRINNING", "FACE", "WITH", "SMILING", "EYES"})
+}
+
+func TestUnicodeDataStringWithMultipleNames(t *testing.T) {
+	var ud UnicodeData
+	ud = NewUnicodeData(128063, "GRINNING FACE WITH SMILING EYES", "DEPRECATED NAME")
+	
+	assert.Equal(t, ud.String(), "U+1F43F	🐿	GRINNING FACE WITH SMILING EYES (DEPRECATED NAME)")
+	assert.ElementsMatch(t, ud.nameWords(), []string{"GRINNING", "FACE", "WITH", "SMILING", "EYES", "DEPRECATED", "NAME"})
+}
+
 func TestPrepareLineIgnoreEmptiness(t *testing.T) {
 	code, name, words, err := PrepareLine("")
 

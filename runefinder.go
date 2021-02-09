@@ -16,6 +16,42 @@ const (
 	Ucd = "UnicodeData.txt"
 )
 
+// UnicodeData represents the unicode data from the file table 
+type UnicodeData struct {
+	code int64
+	name string
+	deprecatedUnicodeName string
+}
+
+// NewUnicodeData create new UnicodeData instance
+func NewUnicodeData(code int64, name string, deprecatedUnicodeName string) UnicodeData {
+	return UnicodeData {
+		code,
+		name,
+		deprecatedUnicodeName,
+	}
+}
+
+func (u *UnicodeData) String() string {
+	newName := u.name
+	if u.deprecatedUnicodeName != "" {
+		newName = fmt.Sprintf("%s (%s)", u.name, u.deprecatedUnicodeName)
+	}
+	return fmt.Sprintf("U+%04X\t%[1]c\t%s", rune(u.code), newName)
+}
+
+func (u *UnicodeData) nameWords() []string {
+	nameWords := split(u.name)
+	if u.deprecatedUnicodeName != "" {
+		for _, word := range split(u.deprecatedUnicodeName) {
+			if !contains(nameWords, word) {
+				nameWords = append(nameWords, word)
+			}
+		}
+	}
+	return nameWords
+}
+
 func split(words string) []string {
 	splitter := func(c rune) bool {
 		return c == ' ' || c == '-'
