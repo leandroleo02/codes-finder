@@ -68,22 +68,8 @@ func containsAll(nameWords []string, words []string) bool {
 
 // FindRunes search in the file for the words in the description
 func FindRunes(r io.Reader, keyWords string) []string {
-	scanner := bufio.NewScanner(r)
-	var runes []string
-	for scanner.Scan() {
-		line := scanner.Text()
-		words := split(keyWords)
-		code, name, nameWords, err := PrepareLine(line)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-		if containsAll(nameWords, words) {
-			lineFormatted := fmt.Sprintf("U+%04X\t%[1]c\t%s", code, name)
-			runes = append(runes, lineFormatted)
-		}
-	}
-	return runes
+	words := split(keyWords)
+	return FindRunesNew(r, words...)
 }
 
 // FindRunesNew search in the file for the words in the description
