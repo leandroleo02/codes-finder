@@ -67,13 +67,7 @@ func containsAll(nameWords []string, words []string) bool {
 }
 
 // FindRunes search in the file for the words in the description
-func FindRunes(r io.Reader, keyWords string) []string {
-	words := split(keyWords)
-	return FindRunesNew(r, words...)
-}
-
-// FindRunesNew search in the file for the words in the description
-func FindRunesNew(r io.Reader, keyWords ...string) []string {
+func FindRunes(r io.Reader, keyWords ...string) []string {
 	scanner := bufio.NewScanner(r)
 	var runes []string
 	for scanner.Scan() {
@@ -105,8 +99,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	keyWords := strings.Join(os.Args[1:], " ")
-	runes := FindRunes(file, strings.ToUpper(keyWords))
+	runes := FindRunes(file, os.Args[1:]...)
 	for _, r := range runes {
 		fmt.Println(r)
 	}

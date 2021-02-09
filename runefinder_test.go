@@ -40,7 +40,7 @@ func TestErrorReadFile(t *testing.T) {
 func TestFindRunesEmptyKeyWord(t *testing.T) {
 	r := unicodeDataFixture()
 
-	runes := FindRunes(r, "")
+	runes := FindRunes(r)
 	assert.Len(t, runes, 8)
 }
 
@@ -54,21 +54,14 @@ func TestFindRunesWithOneKeyWord(t *testing.T) {
 func TestFindRunesWithMoreThanOneWord(t *testing.T) {
 	r := unicodeDataFixture()
 
-	runes := FindRunes(r, "FACE EYES")
+	runes := FindRunes(r, "FACE", "EYES")
 	assert.Len(t, runes, 2)
-}
-
-func TestFindRunesUsingSecondNameColumn(t *testing.T) {
-	r := unicodeDataFixture()
-
-	runes := FindRunes(r, "NON SPACING RIGHT ARROW ABOVE")
-	assert.Len(t, runes, 1)
 }
 
 func TestFindRunesUsingKeyWordsArray(t *testing.T) {
 	r := unicodeDataFixture()
 
-	runes := FindRunesNew(r, "NON", "SPACING", "RIGHT", "ARROW", "ABOVE")
+	runes := FindRunes(r, "NON", "SPACING", "RIGHT", "ARROW", "ABOVE")
 	assert.Len(t, runes, 1)
 }
 
