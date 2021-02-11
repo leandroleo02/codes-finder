@@ -18,7 +18,7 @@ const (
 
 // UnicodeData represents the unicode data from the file table 
 type UnicodeData struct {
-	code int64
+	code rune
 	name string
 	deprecatedUnicodeName string
 }
@@ -26,30 +26,30 @@ type UnicodeData struct {
 // NewUnicodeData create new UnicodeData instance
 func NewUnicodeData(code int64, name string, deprecatedUnicodeName string) UnicodeData {
 	return UnicodeData {
-		code,
+		rune(code),
 		name,
 		deprecatedUnicodeName,
 	}
 }
 
-func (u *UnicodeData) String() string {
+func (u UnicodeData) String() string {
 	newName := u.name
 	if u.deprecatedUnicodeName != "" {
 		newName = fmt.Sprintf("%s (%s)", u.name, u.deprecatedUnicodeName)
 	}
-	return fmt.Sprintf("U+%04X\t%[1]c\t%s", rune(u.code), newName)
+	return fmt.Sprintf("U+%04X\t%[1]c\t%s", u.code, newName)
 }
 
-func (u *UnicodeData) nameWords() []string {
-	nameWords := split(u.name)
+func (u UnicodeData) keyWords() []string {
+	keyWords := split(u.name)
 	if u.deprecatedUnicodeName != "" {
 		for _, word := range split(u.deprecatedUnicodeName) {
-			if !contains(nameWords, word) {
-				nameWords = append(nameWords, word)
+			if !contains(keyWords, word) {
+				keyWords = append(keyWords, word)
 			}
 		}
 	}
-	return nameWords
+	return keyWords
 }
 
 func split(words string) []string {

@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"io"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -21,7 +20,7 @@ func unicodeDataFixture() io.Reader {
 	buf.WriteString("1F604;SMILING FACE WITH OPEN MOUTH AND SMILING EYES;So;0;ON;;;;;N;;;;;\n")
 	buf.WriteString("20D7;COMBINING RIGHT ARROW ABOVE;Mn;230;NSM;;;;;N;NON-SPACING RIGHT ARROW ABOVE;;;;\n")
 
-	return strings.NewReader(buf.String())
+	return &buf
 }
 
 func TestReadFile(t *testing.T) {
@@ -70,7 +69,7 @@ func TestUnicodeDataStringWithSimpleName(t *testing.T) {
 	ud = NewUnicodeData(128063, "CHIPMUNK", "")
 
 	assert.Equal(t, ud.String(), "U+1F43F	🐿	CHIPMUNK")
-	assert.ElementsMatch(t, ud.nameWords(), []string{"CHIPMUNK"})
+	assert.ElementsMatch(t, ud.keyWords(), []string{"CHIPMUNK"})
 }
 
 func TestUnicodeDataStringWithCompoundName(t *testing.T) {
@@ -78,15 +77,15 @@ func TestUnicodeDataStringWithCompoundName(t *testing.T) {
 	ud = NewUnicodeData(128063, "GRINNING FACE WITH SMILING EYES", "")
 
 	assert.Equal(t, ud.String(), "U+1F43F	🐿	GRINNING FACE WITH SMILING EYES")
-	assert.ElementsMatch(t, ud.nameWords(), []string{"GRINNING", "FACE", "WITH", "SMILING", "EYES"})
+	assert.ElementsMatch(t, ud.keyWords(), []string{"GRINNING", "FACE", "WITH", "SMILING", "EYES"})
 }
 
 func TestUnicodeDataStringWithMultipleNames(t *testing.T) {
 	var ud UnicodeData
 	ud = NewUnicodeData(128063, "GRINNING FACE WITH SMILING EYES", "DEPRECATED NAME")
-	
+
 	assert.Equal(t, ud.String(), "U+1F43F	🐿	GRINNING FACE WITH SMILING EYES (DEPRECATED NAME)")
-	assert.ElementsMatch(t, ud.nameWords(), []string{"GRINNING", "FACE", "WITH", "SMILING", "EYES", "DEPRECATED", "NAME"})
+	assert.ElementsMatch(t, ud.keyWords(), []string{"GRINNING", "FACE", "WITH", "SMILING", "EYES", "DEPRECATED", "NAME"})
 }
 
 func TestPrepareLineIgnoreEmptiness(t *testing.T) {
