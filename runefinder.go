@@ -16,16 +16,16 @@ const (
 	Ucd = "UnicodeData.txt"
 )
 
-// UnicodeData represents the unicode data from the file table 
+// UnicodeData represents the unicode data from the file table
 type UnicodeData struct {
-	code rune
-	name string
+	code                  rune
+	name                  string
 	deprecatedUnicodeName string
 }
 
 // NewUnicodeData create new UnicodeData instance
 func NewUnicodeData(code int64, name string, deprecatedUnicodeName string) UnicodeData {
-	return UnicodeData {
+	return UnicodeData{
 		rune(code),
 		name,
 		deprecatedUnicodeName,
@@ -62,7 +62,6 @@ func split(words string) []string {
 // PrepareLine analise the line and returns the fields.
 // docs: https://www.unicode.org/Public/5.1.0/ucd/UCD.html#UnicodeData.txt
 func PrepareLine(line string) (*UnicodeData, error) {
-	var unicodeData UnicodeData
 	if line == "" {
 		return nil, errors.New("Empty Line")
 	}
@@ -70,13 +69,13 @@ func PrepareLine(line string) (*UnicodeData, error) {
 	fields := strings.Split(line, ";")
 	code, _ := strconv.ParseInt(fields[0], 16, 32)
 
-	unicodeData = NewUnicodeData(code, fields[1], fields[10])
+	unicodeData := NewUnicodeData(code, fields[1], fields[10])
 	return &unicodeData, nil
 }
 
 func contains(nameWords []string, word string) bool {
 	for _, wordName := range nameWords {
-		if wordName == strings.ToUpper(word) { // TODO: melhor forma
+		if wordName == word {
 			return true
 		}
 	}
@@ -103,7 +102,7 @@ func FindRunes(r io.Reader, keyWords ...string) []string {
 			log.Println(err)
 			continue
 		}
-		if containsAll(unicodeData.keyWords(), keyWords) {
+		if containsAll(unicodeData.keyWords(), Map(keyWords, strings.ToUpper)) {
 			runes = append(runes, unicodeData.String())
 		}
 	}
@@ -116,6 +115,15 @@ func openUnicodeData(filePath string) (*os.File, error) {
 		return nil, err
 	}
 	return file, nil
+}
+
+// Map applies a mapping function to a string slice
+func Map(list []string, mapping func(s string) string) []string {
+	var newArray = make([]string, len(list))
+	for i, v := range list {
+		newArray[i] = mapping(v)
+	}
+	return newArray
 }
 
 func main() {
