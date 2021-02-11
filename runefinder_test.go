@@ -89,28 +89,26 @@ func TestUnicodeDataStringWithMultipleNames(t *testing.T) {
 }
 
 func TestPrepareLineIgnoreEmptiness(t *testing.T) {
-	code, name, words, err := PrepareLine("")
+	unicodeData, err := PrepareLine("")
 
-	assert.Equal(t, code, int32(-1))
-	assert.Equal(t, name, "")
-	assert.Len(t, words, 0)
+	assert.Nil(t, unicodeData)
 	assert.Error(t, err)
 }
 
 func TestPrepareLineWithSingleWordDescription(t *testing.T) {
-	code, name, words, err := PrepareLine("1F43F;CHIPMUNK;So;0;ON;;;;;N;;;;;")
+	unicodeData, err := PrepareLine("1F43F;CHIPMUNK;So;0;ON;;;;;N;;;;;")
 
 	assert.NoError(t, err)
-	assert.Equal(t, code, rune(128063))
-	assert.Equal(t, name, "CHIPMUNK")
-	assert.Len(t, words, 1)
+	assert.Equal(t, unicodeData.code, rune(128063))
+	assert.Equal(t, unicodeData.name, "CHIPMUNK")
+	assert.Len(t, unicodeData.keyWords(), 1)
 }
 
 func TestPrepareLineWithMultipleWordDescriptionSeparetedOnlyBySpace(t *testing.T) {
-	code, name, words, err := PrepareLine("1F601;GRINNING FACE WITH SMILING EYES;So;0;ON;;;;;N;;;;;")
+	unicodeData, err := PrepareLine("1F601;GRINNING FACE WITH SMILING EYES;So;0;ON;;;;;N;;;;;")
 
 	assert.NoError(t, err)
-	assert.Equal(t, code, rune(128513))
-	assert.Equal(t, name, "GRINNING FACE WITH SMILING EYES")
-	assert.Len(t, words, 5)
+	assert.Equal(t, unicodeData.code, rune(128513))
+	assert.Equal(t, unicodeData.name, "GRINNING FACE WITH SMILING EYES")
+	assert.Len(t, unicodeData.keyWords(), 5)
 }

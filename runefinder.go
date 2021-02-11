@@ -61,27 +61,17 @@ func split(words string) []string {
 
 // PrepareLine analise the line and returns the fields.
 // docs: https://www.unicode.org/Public/5.1.0/ucd/UCD.html#UnicodeData.txt
-func PrepareLine(line string) (rune, string, []string, error) {
+func PrepareLine(line string) (*UnicodeData, error) {
+	var unicodeData UnicodeData
 	if line == "" {
-		return -1, "", nil, errors.New("Empty Line")
+		return nil, errors.New("Empty Line")
 	}
 
 	fields := strings.Split(line, ";")
 	code, _ := strconv.ParseInt(fields[0], 16, 32)
-	name := fields[1]
-	nameWords := split(fields[1])
-	oldUnicodeName := fields[10]
 
-	if oldUnicodeName != "" {
-		name += fmt.Sprintf(" (%s)", oldUnicodeName)
-		for _, word := range split(oldUnicodeName) {
-			if !contains(nameWords, word) {
-				nameWords = append(nameWords, word)
-			}
-		}
-	}
-
-	return rune(code), name, nameWords, nil
+	unicodeData = NewUnicodeData(code, fields[1], fields[10])
+	return &unicodeData, nil
 }
 
 func contains(nameWords []string, word string) bool {
@@ -108,14 +98,13 @@ func FindRunes(r io.Reader, keyWords ...string) []string {
 	var runes []string
 	for scanner.Scan() {
 		line := scanner.Text()
-		code, name, nameWords, err := PrepareLine(line)
+		unicodeData, err := PrepareLine(line)
 		if err != nil {
 			log.Println(err)
 			continue
 		}
-		if containsAll(nameWords, keyWords) {
-			lineFormatted := fmt.Sprintf("U+%04X\t%[1]c\t%s", code, name)
-			runes = append(runes, lineFormatted)
+		if containsAll(unicodeData.keyWords(), keyWords) {
+			runes = append(runes, unicodeData.String())
 		}
 	}
 	return runes
